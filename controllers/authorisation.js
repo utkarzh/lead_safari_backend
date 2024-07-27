@@ -77,7 +77,7 @@ exports.signUp = async (req, resp, next) => {
       const token = jwt.sign(
         { userId: user.id},
         process.env.JWT_SECRET, // Replace JWT_SECRET with your actual secret key
-        { expiresIn: '1h' } // Token expiration time
+     // Token expiration time
       );
   
       // Return user data and token
