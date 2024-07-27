@@ -1,45 +1,56 @@
 const jwt = require("jsonwebtoken");
 const Users = require("../models/User");
-exports.jwtCheck = async (req, resp, next) => {
-  const token = req.header("Authorization");
 
+// Middleware for general JWT check
+exports.jwtCheck = async (req, res, next) => {
   try {
+ 
+    const token = req.header("Authorization");
+  
     if (!token) {
-      throw new Error({ message: "new error" });
+      return res.status(401).json({ message: "Authorization token missing" });
     }
-    const decodedId = await jwt.verify(token, process.env.JWTKEY);
 
-    const admi = await Users.findOne({ where: { id: decodedId.userId } });
+    const decoded = await jwt.verify(token, process.env.JWT_SECRET);
+ 
+    const user = await Users.findOne({ where: { id: decoded.userId } });
 
-    if (admi) {
-      req.user = admi;
-      next();
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
+
+    req.user = user;
+    next();
   } catch (error) {
-    resp.status(404).json({ message: "real hacker spotted!" });
+    console.error("JWT check error:", error);
+    res.status(401).json({ message: "Invalid token or unauthorized access" });
   }
 };
 
-exports.jwtCheckPremium = async (req, resp, next) => {
-  const token = req.header("Authorization");
-  console.log("in prem middleware");
-
+// Middleware for checking premium users
+exports.jwtCheckPremium = async (req, res, next) => {
   try {
-    let admi;
+    
+    const token = req.header("Authorization");
+    console.log(token)
     if (!token) {
-      throw new Error({ message: "new error" });
+      return res.status(401).json({ message: "Authorization token missing" });
     }
-    const decodedId = await jwt.verify(token, process.env.JWTKEY);
-    console.log(decodedId);
 
-    if (decodedId.isPremium) {
-      admi = await Users.findOne({ where: { id: decodedId.userId } });
-      console.log("ha hai ye premium user");
-      req.user = admi;
-      next();
+    const decoded = await jwt.verify(token, process.env.JWT_SECRET);
+    if (!decoded.isPremium) {
+      return res.status(403).json({ message: "Access restricted to premium users" });
     }
+
+    const user = await Users.findOne({ where: { id: decoded.userId } });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    req.user = user;
+    next();
   } catch (error) {
-    console.log("ye nahi hai prem user");
-    resp.status(404).json({ message: "You are not a premium user!" });
+    console.error("Premium user check error:", error);
+    res.status(401).json({ message: "Invalid token or unauthorized access" });
   }
 };

@@ -3,11 +3,11 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 exports.signUp = async (req, resp, next) => {
-    let { name, jobPosition, companyName, industry, city, phoneNumber, email, password } = req.body;
+    let { name, jobPosition, companyName, industry,state, city, phoneNumber, email, password } = req.body;
   
     try {
       // Input validation
-      if (!name || !jobPosition || !companyName || !industry || !city || !phoneNumber || !email || !password) {
+      if (!name || !jobPosition || !companyName ||!state|| !industry || !city || !phoneNumber || !email || !password) {
         throw new Error('Missing fields');
       }
   
@@ -34,6 +34,7 @@ exports.signUp = async (req, resp, next) => {
         email,
         companyName,
         industry,
+        state,
         city,
         phoneNumber,
         password: hashedPassword,
@@ -80,7 +81,8 @@ exports.signUp = async (req, resp, next) => {
       );
   
       // Return user data and token
-      resp.status(200).json({ userDetails: {name:user.name,email:user.email,phoneNumber:user.phoneNumber,jobPosition:user.jobPosition,industry:user.industry,city:user.city,companyName:user.companyName}, token });
+      resp.status(200).json({ userDetails: {name:user.name,email:user.email,phoneNumber:user.phoneNumber,jobPosition:user.jobPosition,industry:user.industry,state:user.state,city:user.city,companyName:user.companyName}, token });
+      
     } catch (error) {
       console.error('Login error:', error.message);
       resp.status(400).json({ message: "Invalid credentials" });

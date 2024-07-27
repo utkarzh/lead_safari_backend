@@ -35,6 +35,10 @@ const User = sequelize.define("User", {
   },industry:{
     type:Sequelize.STRING,
     allowNull:false,
+  },
+  state:{
+    type:Sequelize.STRING,
+    allowNull:false,
   }
   ,city:{
     type:Sequelize.STRING,
