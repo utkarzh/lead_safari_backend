@@ -4,7 +4,7 @@ const cors = require("cors");
 require("dotenv").config();
 const sequelize = require("./util/database");
 const User = require("./models/User");
-
+const adminRoutes=require('./routes/adminRoutes')
 const authorisationRoutes = require("./routes/authorisation");
 const userRoutes = require("./routes/user");
 
@@ -13,8 +13,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(authorisationRoutes);
 app.use(userRoutes);
-// app.use('/admin',adminRoutes);
+app.use('/admin',adminRoutes);
 
-sequelize.sync({force:false}).then((_) => {
+sequelize.sync({force:true}).then((_) => {
   app.listen(3000);
 });
